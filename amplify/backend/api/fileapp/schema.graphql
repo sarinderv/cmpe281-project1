@@ -1,0 +1,6 @@
+type File @model {
+  id: ID!
+  name: String!
+  description: String
+  content: String
+}
