@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { API, Storage } from 'aws-amplify';
+import { API, Storage, Auth } from 'aws-amplify';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import { listFiles } from './graphql/queries';
 import { createFile as createFileMutation, deleteFile as deleteFileMutation } from './graphql/mutations';
 
-const initialFormState = { fileName: '', description: '', fileUploadTime: '', userFirstName: 'sarinder' }
-
 function App() {
+
+  var initialFormState = { fileName: '', description: '', fileUploadTime: '', userFirstName: '?' }
+  Auth.currentUserInfo().then(sess => {
+    console.log(sess);
+    initialFormState.userFirstName = sess.username;//TODO FIXME
+  });
+
   const [files, setFiles] = useState([]);
   const [content, setContent] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
@@ -83,7 +88,7 @@ function App() {
               <th>ID</th>
               <th>Name</th>
               <th>Description</th>
-              <th>Preview</th>
+              <th>Download</th>
               <th>Delete</th>
             </tr>
           </thead>
@@ -95,7 +100,7 @@ function App() {
                   <td>{file.fileName}</td>
                   <td>{file.description}</td>
                   {
-                    file.content && <td><img src={file.content} style={{ width: 40 }} alt="file" /></td>
+                    file.content && <td><a href={file.content} download={file.fileName}><img src={file.content} style={{ width: 40 }} alt={file.fileName}/></a></td>
                   }
                   <td><button onClick={() => deleteFile(file)}>Delete file</button></td>
                 </tr>
