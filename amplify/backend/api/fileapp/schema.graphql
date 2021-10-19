@@ -1,6 +1,9 @@
 type File @model {
   id: ID!
-  name: String!
+  fileName: String!
+  fileUploadTime: AWSDateTime!
   description: String
-  content: String
+  contentType: String
+  userFirstName: String
+  userLastName: String
 }

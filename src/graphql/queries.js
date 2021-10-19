@@ -5,9 +5,12 @@ export const getFile = /* GraphQL */ `
   query GetFile($id: ID!) {
     getFile(id: $id) {
       id
-      name
+      fileName
+      fileUploadTime
       description
-      content
+      contentType
+      userFirstName
+      userLastName
       createdAt
       updatedAt
     }
@@ -22,9 +25,12 @@ export const listFiles = /* GraphQL */ `
     listFiles(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        name
+        fileName
+        fileUploadTime
         description
-        content
+        contentType
+        userFirstName
+        userLastName
         createdAt
         updatedAt
       }

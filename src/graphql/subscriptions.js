@@ -5,9 +5,12 @@ export const onCreateFile = /* GraphQL */ `
   subscription OnCreateFile {
     onCreateFile {
       id
-      name
+      fileName
+      fileUploadTime
       description
-      content
+      contentType
+      userFirstName
+      userLastName
       createdAt
       updatedAt
     }
@@ -17,9 +20,12 @@ export const onUpdateFile = /* GraphQL */ `
   subscription OnUpdateFile {
     onUpdateFile {
       id
-      name
+      fileName
+      fileUploadTime
       description
-      content
+      contentType
+      userFirstName
+      userLastName
       createdAt
       updatedAt
     }
@@ -29,9 +35,12 @@ export const onDeleteFile = /* GraphQL */ `
   subscription OnDeleteFile {
     onDeleteFile {
       id
-      name
+      fileName
+      fileUploadTime
       description
-      content
+      contentType
+      userFirstName
+      userLastName
       createdAt
       updatedAt
     }

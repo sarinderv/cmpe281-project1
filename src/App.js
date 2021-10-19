@@ -5,32 +5,36 @@ import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import { listFiles } from './graphql/queries';
 import { createFile as createFileMutation, deleteFile as deleteFileMutation } from './graphql/mutations';
 
-const initialFormState = { name: '', description: '' }
+const initialFormState = { fileName: '', description: '', fileUploadTime: '', userFirstName: 'sarinder' }
 
 function App() {
   const [files, setFiles] = useState([]);
   const [content, setContent] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
+  const [errorMessages, setErrorMessages] = useState([]);
 
   useEffect(() => {
     fetchFiles();
   }, []);
 
   async function fetchFiles() {
-    const apiData = await API.graphql({ query: listFiles });
-    const filesFromAPI = apiData.data.listFiles.items;
-    await Promise.all(filesFromAPI.map(async file => {
-      if (file.content) {
-        const content = await Storage.get(file.content);
+    try {
+      const apiData = await API.graphql({ query: listFiles });
+      const filesFromAPI = apiData.data.listFiles.items;
+      await Promise.all(filesFromAPI.map(async file => {
+        const content = await Storage.get(file.id);
         file.content = content;
-      }
-      return file;
-    }))
-    setFiles(apiData.data.listFiles.items);
+        return file;
+      }))
+      setFiles(apiData.data.listFiles.items);
+    } catch (e) {
+      console.error('error fetching files', e);
+      setErrorMessages(e.errors);
+    }
   }
 
   async function createFile() {
-    if (!formData.name || !formData.description || !formData.content) return;
+    if (!formData.fileName || !formData.fileUploadTime || !formData.contentType) return;
     const apiData = await API.graphql({ query: createFileMutation, variables: { input: formData } });
     await Storage.put(apiData.data.createFile.id, content);
     fetchFiles();
@@ -38,16 +42,15 @@ function App() {
   }
 
   async function deleteFile({ id }) {
-    const newFilesArray = files.filter(file => file.id !== id);
-    setFiles(newFilesArray);
     await API.graphql({ query: deleteFileMutation, variables: { input: { id } } });
     await Storage.remove(id);
+    fetchFiles();
   }
 
   async function onFileChange(e) {
     if (!e.target.files[0]) return
     const file = e.target.files[0];
-    setFormData({ ...formData, content: file.name });
+    setFormData({ ...formData, contentType: file.type, fileName: file.name, fileUploadTime: new Date() });
     setContent(file);
   }
 
@@ -55,9 +58,9 @@ function App() {
     <div className="App">
       <h1>My Files App</h1>
       <input
-        onChange={e => setFormData({ ...formData, 'name': e.target.value })}
-        placeholder="File name"
-        value={formData.name}
+        readOnly
+        placeholder="File Upload Time"
+        value={formData.fileUploadTime}
       />
       <input
         onChange={e => setFormData({ ...formData, 'description': e.target.value })}
@@ -71,14 +74,17 @@ function App() {
       <button onClick={createFile}>Create File</button>
       <hr />
       <div style={{ marginBottom: 30 }}>
+        {
+          errorMessages && (errorMessages.map((err, i) => <p key={i} class='err'> {err.message} </p>))
+        }
         <table border="1">
           <thead>
             <tr>
               <th>ID</th>
               <th>Name</th>
               <th>Description</th>
-              <th>Delete</th>
               <th>Preview</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>
@@ -86,12 +92,12 @@ function App() {
               files.map(file => (
                 <tr key={file.id}>
                   <td>{file.id}</td>
-                  <td>{file.name}</td>
+                  <td>{file.fileName}</td>
                   <td>{file.description}</td>
-                  <td><button onClick={() => deleteFile(file)}>Delete file</button></td>
                   {
                     file.content && <td><img src={file.content} style={{ width: 40 }} alt="file" /></td>
                   }
+                  <td><button onClick={() => deleteFile(file)}>Delete file</button></td>
                 </tr>
               ))
             }
