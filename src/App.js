@@ -88,6 +88,8 @@ function App() {
               <th>ID</th>
               <th>Name</th>
               <th>Description</th>
+              <th>Updated</th>
+              <th>Uploaded</th>
               <th>Download</th>
               <th>Delete</th>
             </tr>
@@ -99,9 +101,17 @@ function App() {
                   <td>{file.id}</td>
                   <td>{file.fileName}</td>
                   <td>{file.description}</td>
-                  {
-                    file.content && <td><a href={file.content} download={file.fileName}><img src={file.content} style={{ width: 40 }} alt={file.fileName}/></a></td>
-                  }
+                  <td>{file.updatedAt}</td>
+                  <td>{file.fileUploadTime}</td>
+                  <td>
+                    {
+                      file.content && <a href={file.content} download={file.fileName}>
+                        {
+                          file.contentType.startsWith('image/') ? <img src={file.content} style={{ width: 40 }} alt={file.fileName} /> : <>{file.fileName}</>
+                        }
+                      </a>
+                    }
+                  </td>
                   <td><button onClick={() => deleteFile(file)}>Delete file</button></td>
                 </tr>
               ))
