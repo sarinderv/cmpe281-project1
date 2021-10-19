@@ -9,6 +9,7 @@ const initialFormState = { name: '', description: '' }
 
 function App() {
   const [files, setFiles] = useState([]);
+  const [content, setContent] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
 
   useEffect(() => {
@@ -29,13 +30,10 @@ function App() {
   }
 
   async function createFile() {
-    if (!formData.name || !formData.description) return;
-    await API.graphql({ query: createFileMutation, variables: { input: formData } });
-    if (formData.content) {
-      const content = await Storage.get(formData.content);
-      formData.content = content;
-    }
-    setFiles([...files, formData]);
+    if (!formData.name || !formData.description || !formData.content) return;
+    const apiData = await API.graphql({ query: createFileMutation, variables: { input: formData } });
+    await Storage.put(apiData.data.createFile.id, content);
+    fetchFiles();
     setFormData(initialFormState);
   }
 
@@ -43,14 +41,14 @@ function App() {
     const newFilesArray = files.filter(file => file.id !== id);
     setFiles(newFilesArray);
     await API.graphql({ query: deleteFileMutation, variables: { input: { id } } });
+    await Storage.remove(id);
   }
 
   async function onFileChange(e) {
     if (!e.target.files[0]) return
     const file = e.target.files[0];
     setFormData({ ...formData, content: file.name });
-    await Storage.put(file.name, file);
-    fetchFiles();
+    setContent(file);
   }
 
   return (
@@ -71,19 +69,34 @@ function App() {
         onChange={onFileChange}
       />
       <button onClick={createFile}>Create File</button>
+      <hr />
       <div style={{ marginBottom: 30 }}>
-        {
-          files.map(file => (
-            <div key={file.id || file.name}>
-              <h2>{file.name}</h2>
-              <p>{file.description}</p>
-              <button onClick={() => deleteFile(file)}>Delete file</button>
-              {
-                file.content && <img src={file.content} style={{ width: 400 }} alt="file"/>
-              }
-            </div>
-          ))
-        }
+        <table border="1">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Delete</th>
+              <th>Preview</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              files.map(file => (
+                <tr key={file.id}>
+                  <td>{file.id}</td>
+                  <td>{file.name}</td>
+                  <td>{file.description}</td>
+                  <td><button onClick={() => deleteFile(file)}>Delete file</button></td>
+                  {
+                    file.content && <td><img src={file.content} style={{ width: 40 }} alt="file" /></td>
+                  }
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
       </div>
       <AmplifySignOut />
     </div>
