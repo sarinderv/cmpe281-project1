@@ -27,7 +27,7 @@ function App() {
       const apiData = await API.graphql({ query: listFiles });
       const filesFromAPI = apiData.data.listFiles.items;
       await Promise.all(filesFromAPI.map(async file => {
-        const content = await Storage.get(file.id);
+        const content = await Storage.get(file.fileName);
         file.content = content;
         return file;
       }))
@@ -40,8 +40,8 @@ function App() {
 
   async function createFile() {
     if (!formData.fileName || !formData.fileUploadTime || !formData.contentType) return;
-    const apiData = await API.graphql({ query: createFileMutation, variables: { input: formData } });
-    await Storage.put(apiData.data.createFile.id, content);
+    await API.graphql({ query: createFileMutation, variables: { input: formData } });
+    await Storage.put(formData.fileName, content);
     fetchFiles();
     setFormData(initialFormState);
   }
