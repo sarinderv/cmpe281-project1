@@ -3,7 +3,7 @@ import './App.css';
 import { API, Storage, Auth, Hub } from 'aws-amplify';
 import { withAuthenticator, AmplifySignOut, AmplifyS3Image } from '@aws-amplify/ui-react';
 import { listFiles } from './graphql/queries';
-import { createFile as createFileMutation, deleteFile as deleteFileMutation } from './graphql/mutations';
+import { createFile as createFileMutation, deleteFile as deleteFileMutation, updateFile as updateFileMutation } from './graphql/mutations';
 
 // see https://docs.amplify.aws/lib/storage/configureaccess/q/platform/js/
 Storage.configure({ level: 'private' });
@@ -79,6 +79,11 @@ function App() {
     setFormData(initialFormState);
   }
 
+  async function updateFile(file) {
+    await API.graphql({ query: updateFileMutation, variables: { input: file } });
+    fetchFiles();
+  }
+
   async function deleteFile(file) {
     await API.graphql({ query: deleteFileMutation, variables: { input: { id: file.id } } });
     await Storage.remove(file.fileName);
@@ -99,19 +104,19 @@ function App() {
   function userInfo() {
     return (
       <>
-        {userData.username}
-        <hr />
-        { isAdmin() ? "Admin" : "User"}
-        <hr />
+        {userData.username} <div className="badge">{ isAdmin() ? "Admin" : "User"}</div>
       </>
     );
   }
+
+  // date formatter
+  const df = new Intl.DateTimeFormat('en-US', { dateStyle: 'short', timeStyle: 'short' }); 
 
   return (
     <div className="App">
       <h1>Sarinder Virk - CMPE281 Project#1 - Files App</h1>
       { userInfo()}
-      <br />
+      <hr />
       <input
         readOnly
         placeholder="File Upload Time"
@@ -132,11 +137,12 @@ function App() {
         {
           errorMessages && (errorMessages.map((err, i) => <p key={i} class='err'> {err.message} </p>))
         }
-        <table border="1">
+        <table>
           <thead>
             <tr>
               {/* <th>ID</th> */}
-              <th>Name</th>
+              <th>User Name</th>
+              <th>File Name</th>
               <th>Description</th>
               <th>Updated</th>
               <th>Uploaded</th>
@@ -146,13 +152,14 @@ function App() {
           </thead>
           <tbody>
             {
-              files.map(file => (
+              files.sort((a, b) => a.updatedAt > b.updatedAt ? 1 : -1).map(file => (
                 <tr key={file.id}>
                   {/* <td>{file.id}</td> */}
+                  <td>{file.owner}</td>
                   <td>{file.fileName}</td>
-                  <td>{file.description}</td>
-                  <td>{file.updatedAt}</td>
-                  <td>{file.fileUploadTime}</td>
+                  <td><input type="text" onKeyDown={updateFile} defaultValue={file.description}/></td>
+                  <td>{df.format(new Date(file.updatedAt))}</td>
+                  <td>{df.format(new Date(file.fileUploadTime))}</td>
                   <td>
                     {
                       file.content && <a href={file.content} download={file.fileName}>
