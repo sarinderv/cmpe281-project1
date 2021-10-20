@@ -1,0 +1,18 @@
+{
+  "trigger": true,
+  "modules": [
+    "add-to-group"
+  ],
+  "parentResource": "cmpe281project16173a9cd",
+  "functionName": "cmpe281project16173a9cdPostConfirmation",
+  "resourceName": "cmpe281project16173a9cdPostConfirmation",
+  "parentStack": "auth",
+  "triggerEnvs": [],
+  "triggerDir": "/snapshot/node_modules/amplify-category-auth/provider-utils/awscloudformation/triggers/PostConfirmation",
+  "triggerTemplate": "PostConfirmation.json.ejs",
+  "triggerEventPath": "PostConfirmation.event.json",
+  "roleName": "cmpe281project16173a9cdPostConfirmation",
+  "skipEdit": true,
+  "GROUP": "Users",
+  "enableCors": false
+}

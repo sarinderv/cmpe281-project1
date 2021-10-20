@@ -24,13 +24,17 @@
     "userpoolClientGenerateSecret": false,
     "userpoolClientRefreshTokenValidity": 30,
     "userpoolClientWriteAttributes": [
+        "family_name",
+        "given_name",
         "email"
     ],
     "userpoolClientReadAttributes": [
-        "email"
+        "email",
+        "family_name",
+        "given_name"
     ],
     "userpoolClientLambdaRole": "cmpe286173a9cd_userpoolclient_lambda_role",
-    "userpoolClientSetAttributes": false,
+    "userpoolClientSetAttributes": true,
     "sharedId": "6173a9cd",
     "resourceName": "cmpe281project16173a9cd",
     "authSelections": "identityPoolAndUserPool",
@@ -46,9 +50,37 @@
             "Arn"
         ]
     },
-    "useDefault": "default",
-    "userPoolGroupList": [],
+    "useDefault": "manual",
+    "userPoolGroupList": [
+        "Users",
+        "Admins"
+    ],
     "serviceName": "Cognito",
     "usernameCaseSensitive": false,
-    "dependsOn": []
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "cmpe281project16173a9cdPostConfirmation",
+            "triggerProvider": "Cognito",
+            "attributes": [
+                "Arn",
+                "Name"
+            ]
+        }
+    ],
+    "thirdPartyAuth": false,
+    "userPoolGroups": true,
+    "adminQueries": true,
+    "triggers": "{\n  \"PostConfirmation\": [\n    \"add-to-group\"\n  ]\n}",
+    "hostedUI": false,
+    "adminQueryGroup": "Admins",
+    "parentStack": {
+        "Ref": "AWS::StackId"
+    },
+    "authTriggerConnections": "[\n  {\n    \"triggerType\": \"PostConfirmation\",\n    \"lambdaFunctionName\": \"cmpe281project16173a9cdPostConfirmation\"\n  }\n]",
+    "breakCircularDependency": true,
+    "permissions": [
+        "{\n  \"policyName\": \"AddToGroupCognito\",\n  \"trigger\": \"PostConfirmation\",\n  \"effect\": \"Allow\",\n  \"actions\": [\n    \"cognito-idp:AdminAddUserToGroup\",\n    \"cognito-idp:GetGroup\",\n    \"cognito-idp:CreateGroup\"\n  ],\n  \"resource\": {\n    \"paramType\": \"!GetAtt\",\n    \"keys\": [\n      \"UserPool\",\n      \"Arn\"\n    ]\n  }\n}"
+    ],
+    "authProviders": []
 }

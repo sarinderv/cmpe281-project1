@@ -62,11 +62,9 @@ function App() {
         return file;
       }))
       setFiles(apiData.data.listFiles.items);
-      // if (isAdmin()) {
-      //   Storage.list('', { level: 'private' })
-      //     .then(result => console.log(result))
-      //     .catch(err => console.log(err));
-      // }
+      Storage.list('', { level: 'private' })
+        .then(result => console.log(result))
+        .catch(err => console.log(err));
     } catch (e) {
       console.error('error fetching files', e);
       setErrorMessages(e.errors);

@@ -10,6 +10,18 @@ Parameters:
     Type: String
 
   
+  
+  
+  functioncmpe281project16173a9cdPostConfirmationArn:
+    Type: String
+    Default: functioncmpe281project16173a9cdPostConfirmationArn
+  
+  functioncmpe281project16173a9cdPostConfirmationName:
+    Type: String
+    Default: functioncmpe281project16173a9cdPostConfirmationName
+  
+  
+  
 
     
   identityPoolName:
@@ -122,7 +134,6 @@ Parameters:
   userPoolGroupList:
     Type: CommaDelimitedList
       
-            
   serviceName:
     Type: String
   
@@ -133,6 +144,50 @@ Parameters:
             
         
   dependsOn:
+    Type: CommaDelimitedList
+      
+  
+  thirdPartyAuth:
+    Type: String
+            
+  
+  userPoolGroups:
+    Type: String
+            
+  
+  adminQueries:
+    Type: String
+            
+  triggers:
+    Type: String
+  
+            
+  
+  hostedUI:
+    Type: String
+            
+  adminQueryGroup:
+    Type: String
+  
+            
+      
+  parentStack:
+    Type: String
+        
+  authTriggerConnections:
+    Type: String
+  
+            
+  
+  breakCircularDependency:
+    Type: String
+            
+        
+  permissions:
+    Type: CommaDelimitedList
+      
+        
+  authProviders:
     Type: CommaDelimitedList
       
 Conditions:
@@ -229,6 +284,9 @@ Resources:
     Properties:
       ClientName: cmpe286173a9cd_app_clientWeb
       
+      ReadAttributes: !Ref userpoolClientReadAttributes
+      WriteAttributes: !Ref userpoolClientWriteAttributes
+      
       RefreshTokenValidity: !Ref userpoolClientRefreshTokenValidity
       UserPoolId: !Ref UserPool
     DependsOn: UserPool
@@ -238,6 +296,9 @@ Resources:
     Type: "AWS::Cognito::UserPoolClient"
     Properties:
       ClientName: cmpe286173a9cd_app_client
+      
+      ReadAttributes: !Ref userpoolClientReadAttributes
+      WriteAttributes: !Ref userpoolClientWriteAttributes
       
       GenerateSecret: !Ref userpoolClientGenerateSecret
       RefreshTokenValidity: !Ref userpoolClientRefreshTokenValidity

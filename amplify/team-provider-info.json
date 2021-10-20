@@ -20,6 +20,15 @@
         "S3Triggerc8c424e6": {
           "deploymentBucketName": "amplify-amplifybda44a62ea344-staging-55306-deployment",
           "s3Key": "amplify-builds/S3Triggerc8c424e6-52766f71674154332b38-build.zip"
+        },
+        "cmpe281project16173a9cdPostConfirmation": {
+          "GROUP": "Users",
+          "deploymentBucketName": "amplify-amplifybda44a62ea344-staging-55306-deployment",
+          "s3Key": "amplify-builds/cmpe281project16173a9cdPostConfirmation-3057513072656c712f6c-build.zip"
+        },
+        "AdminQueriesf1ae536e": {
+          "deploymentBucketName": "amplify-amplifybda44a62ea344-staging-55306-deployment",
+          "s3Key": "amplify-builds/AdminQueriesf1ae536e-573171714e395a657a38-build.zip"
         }
       }
     }
