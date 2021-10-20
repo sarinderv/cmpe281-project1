@@ -10,7 +10,7 @@ Storage.configure({ level: 'private' });
 
 function App() {
 
-  var initialFormState = { fileName: '', description: '', fileUploadTime: '', userFirstName: '' }
+  var initialFormState = { fileName: '', description: '', fileUploadTime: '', userFirstName: '' };
 
   const listener = (data) => {
     switch (data.payload.event) {
@@ -32,22 +32,24 @@ function App() {
   }
   Hub.listen('auth', listener);
 
-  const [userSession, setUserSession] = useState({username: ''});
+  const [userData, setUserData] = useState({ username: '' });
   const [files, setFiles] = useState([]);
   const [content, setContent] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
   const [errorMessages, setErrorMessages] = useState([]);
 
   useEffect(() => {
-    fetchSession();
+    fetchUserData();
     fetchFiles();
   }, []);
 
-  async function fetchSession() {
-    let sess = await Auth.currentUserInfo();
-    Auth.currentCredentials().then( cred => console.log(cred.identityId) );
-    console.log("session: ", sess);
-    setUserSession(sess);
+  async function fetchUserData() {
+    await Auth.currentAuthenticatedUser()
+      .then((userSession) => {
+        console.log("userData: ", userSession.signInUserSession.accessToken.payload);
+        setUserData(userSession.signInUserSession.accessToken.payload);
+      })
+      .catch((e) => console.log("Not signed in", e));
   }
 
   async function fetchFiles() {
@@ -55,11 +57,16 @@ function App() {
       const apiData = await API.graphql({ query: listFiles });
       const filesFromAPI = apiData.data.listFiles.items;
       await Promise.all(filesFromAPI.map(async file => {
-        const content = await Storage.get(fileNameWithPrefix());
+        const content = await Storage.get(formData.fileName);
         file.content = content;
         return file;
       }))
       setFiles(apiData.data.listFiles.items);
+      // if (isAdmin()) {
+      //   Storage.list('', { level: 'private' })
+      //     .then(result => console.log(result))
+      //     .catch(err => console.log(err));
+      // }
     } catch (e) {
       console.error('error fetching files', e);
       setErrorMessages(e.errors);
@@ -74,9 +81,9 @@ function App() {
     setFormData(initialFormState);
   }
 
-  async function deleteFile({ id }) {
-    await API.graphql({ query: deleteFileMutation, variables: { input: { id } } });
-    await Storage.remove(id);
+  async function deleteFile(file) {
+    await API.graphql({ query: deleteFileMutation, variables: { input: { id: file.id } } });
+    await Storage.remove(file.fileName);
     fetchFiles();
   }
 
@@ -87,19 +94,25 @@ function App() {
     setContent(file);
   }
 
-  function fileNameWithPrefix() {
-    let prefix = '';//userSession.attributes.sub +"/";
-    return prefix + formData.fileName;
+  function isAdmin() {
+    return userData['cognito:groups'] && userData['cognito:groups'][0] === "Admins";
+  }
+
+  function userInfo() {
+    return (
+      <>
+        {userData.username}
+        <hr />
+        { isAdmin() ? "Admin" : "User"}
+        <hr />
+      </>
+    );
   }
 
   return (
     <div className="App">
-      <h1>My Files App</h1>
-      <input
-        readOnly
-        placeholder="Username"
-        value={userSession.username}
-      />
+      <h1>Sarinder Virk - CMPE281 Project#1 - Files App</h1>
+      { userInfo()}
       <br />
       <input
         readOnly
