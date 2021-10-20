@@ -135,7 +135,7 @@ function App() {
         <table border="1">
           <thead>
             <tr>
-              <th>ID</th>
+              {/* <th>ID</th> */}
               <th>Name</th>
               <th>Description</th>
               <th>Updated</th>
@@ -148,7 +148,7 @@ function App() {
             {
               files.map(file => (
                 <tr key={file.id}>
-                  <td>{file.id}</td>
+                  {/* <td>{file.id}</td> */}
                   <td>{file.fileName}</td>
                   <td>{file.description}</td>
                   <td>{file.updatedAt}</td>
