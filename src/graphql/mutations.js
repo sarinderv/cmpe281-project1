@@ -16,6 +16,7 @@ export const createFile = /* GraphQL */ `
       userLastName
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -34,6 +35,7 @@ export const updateFile = /* GraphQL */ `
       userLastName
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -52,6 +54,7 @@ export const deleteFile = /* GraphQL */ `
       userLastName
       createdAt
       updatedAt
+      owner
     }
   }
 `;

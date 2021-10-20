@@ -72,12 +72,17 @@
       "providerPlugin": "awscloudformation",
       "dependsOn": [
         {
-          "category": "function",
-          "resourceName": "S3Triggerc8c424e6",
+          "category": "auth",
+          "resourceName": "cmpe281project16173a9cd",
           "attributes": [
-            "Name",
-            "Arn",
-            "LambdaExecutionRole"
+            "UserPoolId"
+          ]
+        },
+        {
+          "category": "auth",
+          "resourceName": "userPoolGroups",
+          "attributes": [
+            "AdminsGroupRole"
           ]
         }
       ]

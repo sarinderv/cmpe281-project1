@@ -13,7 +13,8 @@
     },
     "categories": {
       "auth": {
-        "cmpe281project16173a9cd": {}
+        "cmpe281project16173a9cd": {},
+        "userPoolGroups": {}
       },
       "function": {
         "S3Triggerc8c424e6": {

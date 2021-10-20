@@ -2,8 +2,8 @@
 // this is an auto generated file. This will be overwritten
 
 export const onCreateFile = /* GraphQL */ `
-  subscription OnCreateFile {
-    onCreateFile {
+  subscription OnCreateFile($owner: String) {
+    onCreateFile(owner: $owner) {
       id
       fileName
       fileUploadTime
@@ -13,12 +13,13 @@ export const onCreateFile = /* GraphQL */ `
       userLastName
       createdAt
       updatedAt
+      owner
     }
   }
 `;
 export const onUpdateFile = /* GraphQL */ `
-  subscription OnUpdateFile {
-    onUpdateFile {
+  subscription OnUpdateFile($owner: String) {
+    onUpdateFile(owner: $owner) {
       id
       fileName
       fileUploadTime
@@ -28,12 +29,13 @@ export const onUpdateFile = /* GraphQL */ `
       userLastName
       createdAt
       updatedAt
+      owner
     }
   }
 `;
 export const onDeleteFile = /* GraphQL */ `
-  subscription OnDeleteFile {
-    onDeleteFile {
+  subscription OnDeleteFile($owner: String) {
+    onDeleteFile(owner: $owner) {
       id
       fileName
       fileUploadTime
@@ -43,6 +45,7 @@ export const onDeleteFile = /* GraphQL */ `
       userLastName
       createdAt
       updatedAt
+      owner
     }
   }
 `;

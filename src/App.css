@@ -41,3 +41,8 @@
   color: red;
   font-family: 'Courier New', monospace;
 }
+
+amplify-s3-image {
+  --height: 60px;
+  --width: 60px;
+}

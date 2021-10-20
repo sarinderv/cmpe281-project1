@@ -13,6 +13,7 @@ export const getFile = /* GraphQL */ `
       userLastName
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -33,6 +34,7 @@ export const listFiles = /* GraphQL */ `
         userLastName
         createdAt
         updatedAt
+        owner
       }
       nextToken
     }

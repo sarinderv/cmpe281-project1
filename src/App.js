@@ -1,33 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { API, Storage, Auth } from 'aws-amplify';
-import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import { API, Storage, Auth, Hub } from 'aws-amplify';
+import { withAuthenticator, AmplifySignOut, AmplifyS3Image } from '@aws-amplify/ui-react';
 import { listFiles } from './graphql/queries';
 import { createFile as createFileMutation, deleteFile as deleteFileMutation } from './graphql/mutations';
 
+// see https://docs.amplify.aws/lib/storage/configureaccess/q/platform/js/
+Storage.configure({ level: 'private' });
+
 function App() {
 
-  var initialFormState = { fileName: '', description: '', fileUploadTime: '', userFirstName: '?' }
-  Auth.currentUserInfo().then(sess => {
-    console.log(sess);
-    initialFormState.userFirstName = sess.username;//TODO FIXME
-  });
+  var initialFormState = { fileName: '', description: '', fileUploadTime: '', userFirstName: '' }
 
+  const listener = (data) => {
+    switch (data.payload.event) {
+      case 'signIn':
+        console.info('user signed in');
+        break;
+      case 'signOut':
+        console.info('user signed out');
+        break;
+      case 'signIn_failure':
+        console.error('user sign in failed');
+        break;
+      case 'configured':
+        console.info('the Auth module is configured');
+        break;
+      default:
+        console.error('unknown event: ', data.payload.event);
+    }
+  }
+  Hub.listen('auth', listener);
+
+  const [userSession, setUserSession] = useState({username: ''});
   const [files, setFiles] = useState([]);
   const [content, setContent] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
   const [errorMessages, setErrorMessages] = useState([]);
 
   useEffect(() => {
+    fetchSession();
     fetchFiles();
   }, []);
+
+  async function fetchSession() {
+    let sess = await Auth.currentUserInfo();
+    Auth.currentCredentials().then( cred => console.log(cred.identityId) );
+    console.log("session: ", sess);
+    setUserSession(sess);
+  }
 
   async function fetchFiles() {
     try {
       const apiData = await API.graphql({ query: listFiles });
       const filesFromAPI = apiData.data.listFiles.items;
       await Promise.all(filesFromAPI.map(async file => {
-        const content = await Storage.get(file.fileName);
+        const content = await Storage.get(fileNameWithPrefix());
         file.content = content;
         return file;
       }))
@@ -59,9 +87,20 @@ function App() {
     setContent(file);
   }
 
+  function fileNameWithPrefix() {
+    let prefix = '';//userSession.attributes.sub +"/";
+    return prefix + formData.fileName;
+  }
+
   return (
     <div className="App">
       <h1>My Files App</h1>
+      <input
+        readOnly
+        placeholder="Username"
+        value={userSession.username}
+      />
+      <br />
       <input
         readOnly
         placeholder="File Upload Time"
@@ -107,7 +146,7 @@ function App() {
                     {
                       file.content && <a href={file.content} download={file.fileName}>
                         {
-                          file.contentType.startsWith('image/') ? <img src={file.content} style={{ width: 40 }} alt={file.fileName} /> : <>{file.fileName}</>
+                          file.contentType.startsWith('image/') ? <AmplifyS3Image level="private" imgKey={file.fileName} alt={file.fileName} /> : <>{file.fileName}</>
                         }
                       </a>
                     }
